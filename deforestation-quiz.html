@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deforestation Crypto Hack Quiz</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom right, #64d4aa, #329d9c);
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+    }
+    .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: #1b1b1b;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    .question {
+        margin: 20px 0;
+        font-size: 1.3em;
+    }
+    .answers button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        font-size: 1em;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background-color: #2ecc71;
+        color: #fff;
+        transition: background 0.3s;
+    }
+    .answers button:hover {
+        background-color: #27ae60;
+    }
+    .hidden {
+        display: none;
+    }
+    .score {
+        font-size: 1.5em;
+        margin: 20px 0;
+    }
+    .timer {
+        font-size: 1.2em;
+        margin: 10px 0;
+        color: #f1c40f;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Crypto Hack: Deforestation Quiz</h1>
+    <div id="nameForm">
+        <p>Enter your name to start:</p>
+        <input type="text" id="playerName" placeholder="Your Name">
+        <button onclick="startGame()">Start</button>
+    </div>
+    <div id="quiz" class="hidden">
+        <div id="questionContainer">
+            <div class="question" id="question"></div>
+            <div class="timer" id="timer"></div>
+            <div class="answers" id="answers"></div>
+        </div>
+    </div>
+    <div id="result" class="hidden">
+        <div class="score" id="scoreDisplay"></div>
+        <p id="rewardMessage"></p>
+    </div>
+</div>
+
+<script>
+const questions = [
+    { q: "What is deforestation?", options: ["Cutting down trees and forests", "Planting more trees", "Cleaning the forest", "Making the forest bigger"], answer: 0 },
+    { q: "Why do people cut down trees?", options: ["To build houses", "To make paper", "To grow farms", "All of the above"], answer: 3 },
+    { q: "What happens when too many trees are cut down?", options: ["More animals live there", "The air gets worse", "The Earth becomes healthier", "There are more trees"], answer: 1 },
+    { q: "How can we help stop deforestation?", options: ["Plant more trees", "Throw rubbish in the forest", "Cut more trees", "Burn forests"], answer: 0 },
+    { q: "Why are trees important?", options: ["They give us oxygen", "They make us sleepy", "They make the ground dirty", "They make paper fly"], answer: 0 },
+    { q: "What is one danger of deforestation?", options: ["More wildlife", "Soil erosion", "Better air quality", "More rain"], answer: 1 },
+    { q: "Who is affected by deforestation?", options: ["Only humans", "Only animals", "Humans, animals, and the environment", "Only insects"], answer: 2 },
+    { q: "How long does it take for forests to grow back fully?", options: ["A few weeks", "Many years", "A few months", "One day"], answer: 1 },
+    { q: "Which action helps forests?", options: ["Recycle paper", "Cut more trees", "Throw plastic in the forest", "Burn trees"], answer: 0 },
+    { q: "BONUS (University Level): What is the term for the gradual destruction of forests due to human activities, often leading to desert-like conditions?", options: ["Deforestation", "Desertification", "Reforestation", "Afforestation"], answer: 1 }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let timerInterval;
+let timeLeft = 10;
+
+function startGame() {
+    const name = document.getElementById('playerName').value.trim();
+    if (name === "") {
+        alert("Please enter your name.");
+        return;
+    }
+    document.getElementById('nameForm').classList.add('hidden');
+    document.getElementById('quiz').classList.remove('hidden');
+    showQuestion();
+}
+
+function showQuestion() {
+    clearInterval(timerInterval);
+
+    if (currentQuestion >= questions.length) {
+        endGame();
+        return;
+    }
+
+    timeLeft = 10;
+    document.getElementById('timer').innerText = `Time left: ${timeLeft}s`;
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = `Time left: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            currentQuestion++;
+            showQuestion();
+        }
+    }, 1000);
+
+    const q = questions[currentQuestion];
+    document.getElementById('question').innerText = q.q;
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = "";
+
+    q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(idx);
+        answersDiv.appendChild(btn);
+    });
+}
+
+function checkAnswer(selected) {
+    if (selected === questions[currentQuestion].answer) {
+        score++;
+    }
+    currentQuestion++;
+    showQuestion();
+}
+
+function endGame() {
+    clearInterval(timerInterval);
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('result').classList.remove('hidden');
+    document.getElementById('scoreDisplay').innerText = `You scored ${score} out of 10!`;
+    if (score >= 9) {
+        document.getElementById('rewardMessage').innerText = "Congratulations! You may get 2 free Mentos!";
+    } else {
+        document.getElementById('rewardMessage').innerText = "Thank you for playing!";
+    }
+}
+</script>
+</body>
+</html>
