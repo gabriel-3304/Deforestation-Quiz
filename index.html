@@ -154,13 +154,22 @@ const questions = [
     { q: "BONUS (University Level): Which term describes the long-term process where forests are lost due to human activities, eventually damaging land, water, and biodiversity?", options: ["Deforestation", "Desertification", "Reforestation", "Afforestation"], answer: 1 }
 ];
 
-const prizes = ["Customizable Keychain", "Pencil", "Reusable Cutlery", "NOTHING - Thanks for participating!", "Draw Again"];
+const prizes = [
+    "Customizable Keychain",
+    "Pencil",
+    "Reusable Cutlery",
+    "NOTHING - Thanks for participating!",
+    "NOTHING - Thanks for participating!",
+    "NOTHING - Thanks for participating!",
+    "Draw Again"
+];
 
 let currentQuestion = 0;
 let score = 0;
 let timerInterval;
 let timeLeft = 10;
 let drawn = false;
+let usedNames = [];
 
 function playSound(id) {
     document.getElementById(id).currentTime = 0;
@@ -168,14 +177,21 @@ function playSound(id) {
 }
 
 function startGame() {
-    const name = document.getElementById('playerName').value.trim();
+    const name = document.getElementById('playerName').value.trim().toLowerCase();
     if (name === "") {
         alert("Please enter your name.");
         return;
     }
+    if (usedNames.includes(name)) {
+        alert("You have already played. Only one attempt allowed.");
+        return;
+    }
+    usedNames.push(name);
     playSound('clickSound');
     document.getElementById('nameForm').classList.add('hidden');
     document.getElementById('quiz').classList.remove('hidden');
+    currentQuestion = 0;
+    score = 0;
     showQuestion();
 }
 
@@ -234,6 +250,7 @@ function endGame() {
         prizeSection.innerHTML = `<p>Congratulations! You qualify for the Prize Draw!</p><button onclick="startPrizeDraw()">Start Prize Draw</button><div id="prizeResult" class="prize"></div>`;
     } else {
         prizeSection.innerHTML = `<p>Thank you for playing!</p>`;
+        setTimeout(resetGame, 5000);
     }
 }
 
@@ -255,11 +272,19 @@ function startPrizeDraw() {
                     secondPrize = prizes[Math.floor(Math.random() * prizes.length)];
                 } while (secondPrize === "Draw Again");
                 prizeResult.innerText = `Your Prize: ${secondPrize}`;
+                setTimeout(resetGame, 5000);
             }, 2000);
         } else {
             prizeResult.innerText = `Your Prize: ${prize}`;
+            setTimeout(resetGame, 5000);
         }
     }, 2000);
+}
+
+function resetGame() {
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('nameForm').classList.remove('hidden');
+    document.getElementById('playerName').value = "";
 }
 </script>
 </body>
