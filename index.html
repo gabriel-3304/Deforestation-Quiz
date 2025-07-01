@@ -137,6 +137,7 @@
     <div id="result" class="hidden">
         <div class="score" id="scoreDisplay"></div>
         <div id="prizeSection"></div>
+        <div id="resetButtonContainer"></div>
     </div>
 </div>
 
@@ -247,11 +248,13 @@ function endGame() {
     document.getElementById('scoreDisplay').innerText = `You scored ${score} out of 10!`;
 
     const prizeSection = document.getElementById('prizeSection');
+    const resetButtonContainer = document.getElementById('resetButtonContainer');
+    resetButtonContainer.innerHTML = '<button onclick="resetGame()">Back to Start</button>';
+
     if (score >= 5) {
         prizeSection.innerHTML = `<p>Congratulations! You qualify for the Prize Draw!</p><button onclick="startPrizeDraw()">Start Prize Draw</button><div id="prizeResult" class="prize"></div>`;
     } else {
         prizeSection.innerHTML = `<p>Thank you for playing!</p>`;
-        setTimeout(resetGame, 5000);
     }
 }
 
@@ -273,11 +276,9 @@ function startPrizeDraw() {
                     secondPrize = prizes[Math.floor(Math.random() * prizes.length)];
                 } while (secondPrize === "Draw Again");
                 prizeResult.innerText = `Your Prize: ${secondPrize}`;
-                setTimeout(resetGame, 5000);
             }, 2000);
         } else {
             prizeResult.innerText = `Your Prize: ${prize}`;
-            setTimeout(resetGame, 5000);
         }
     }, 2000);
 }
