@@ -6,55 +6,120 @@
 <title>Deforestation Crypto Hack Quiz</title>
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to bottom right, #64d4aa, #329d9c);
-        color: #fff;
+        font-family: "Courier New", monospace;
+        background: #000;
+        color: #00ff00;
         text-align: center;
         padding: 20px;
+        overflow-x: hidden;
+        animation: flickerBackground 3s infinite alternate;
+    }
+    @keyframes flickerBackground {
+        0% { background-color: #000; }
+        100% { background-color: #001100; }
     }
     .container {
         max-width: 500px;
         margin: 0 auto;
-        background: #1b1b1b;
+        background: #111;
         padding: 20px;
         border-radius: 15px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        box-shadow: 0 0 30px rgba(0,255,0,0.7);
+        border: 2px solid #00ff00;
+        animation: pulseBorder 2s infinite;
+    }
+    @keyframes pulseBorder {
+        0% { box-shadow: 0 0 20px #00ff00; }
+        50% { box-shadow: 0 0 40px #00ff00; }
+        100% { box-shadow: 0 0 20px #00ff00; }
+    }
+    h1 {
+        font-size: 2em;
+        margin-bottom: 15px;
+        color: #00ff00;
+        text-shadow: 0 0 10px #00ff00;
+        animation: flickerText 1.5s infinite alternate;
+    }
+    @keyframes flickerText {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
     }
     .question {
         margin: 20px 0;
-        font-size: 1.3em;
+        font-size: 1.5em;
     }
     .answers button {
         display: block;
         width: 100%;
         margin: 10px 0;
-        padding: 10px;
-        font-size: 1em;
-        border: none;
+        padding: 12px;
+        font-size: 1.1em;
+        border: 2px solid #00ff00;
         border-radius: 8px;
         cursor: pointer;
-        background-color: #2ecc71;
-        color: #fff;
-        transition: background 0.3s;
+        background: #000;
+        color: #00ff00;
+        transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
     }
     .answers button:hover {
-        background-color: #27ae60;
+        transform: scale(1.05);
+        background: #003300;
+        box-shadow: 0 0 10px #00ff00;
     }
     .hidden {
         display: none;
     }
     .score {
-        font-size: 1.5em;
+        font-size: 1.8em;
         margin: 20px 0;
+        color: #00ff00;
+        text-shadow: 0 0 10px #00ff00;
     }
     .timer {
-        font-size: 1.2em;
+        font-size: 1.3em;
         margin: 10px 0;
-        color: #f1c40f;
+        color: #00ff00;
+        text-shadow: 0 0 10px #00ff00;
+    }
+    input[type="text"] {
+        padding: 10px;
+        width: 80%;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 2px solid #00ff00;
+        background: #000;
+        color: #00ff00;
+    }
+    button {
+        background: #000;
+        color: #00ff00;
+        border: 2px solid #00ff00;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-top: 10px;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+        background: #003300;
+        box-shadow: 0 0 10px #00ff00;
+    }
+    .prize {
+        font-size: 1.5em;
+        margin: 20px;
+        color: #00ff00;
+        text-shadow: 0 0 10px #00ff00;
     }
 </style>
 </head>
 <body>
+<audio id="clickSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
+<audio id="drawSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+<audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+<audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_snap.ogg"></audio>
+
 <div class="container">
     <h1>Crypto Hack: Deforestation Quiz</h1>
     <div id="nameForm">
@@ -71,7 +136,7 @@
     </div>
     <div id="result" class="hidden">
         <div class="score" id="scoreDisplay"></div>
-        <p id="rewardMessage"></p>
+        <div id="prizeSection"></div>
     </div>
 </div>
 
@@ -86,13 +151,21 @@ const questions = [
     { q: "Who is affected by deforestation?", options: ["Only humans", "Only animals", "Humans, animals, and the environment", "Only insects"], answer: 2 },
     { q: "How long does it take for forests to grow back fully?", options: ["A few weeks", "Many years", "A few months", "One day"], answer: 1 },
     { q: "Which action helps forests?", options: ["Recycle paper", "Cut more trees", "Throw plastic in the forest", "Burn trees"], answer: 0 },
-    { q: "BONUS (University Level): What is the term for the gradual destruction of forests due to human activities, often leading to desert-like conditions?", options: ["Deforestation", "Desertification", "Reforestation", "Afforestation"], answer: 1 }
+    { q: "BONUS (University Level): Which term describes the long-term process where forests are lost due to human activities, eventually damaging land, water, and biodiversity?", options: ["Deforestation", "Desertification", "Reforestation", "Afforestation"], answer: 1 }
 ];
+
+const prizes = ["Customizable Keychain", "Pencil", "Reusable Cutlery", "NOTHING - Thanks for participating!", "Draw Again"];
 
 let currentQuestion = 0;
 let score = 0;
 let timerInterval;
 let timeLeft = 10;
+let drawn = false;
+
+function playSound(id) {
+    document.getElementById(id).currentTime = 0;
+    document.getElementById(id).play();
+}
 
 function startGame() {
     const name = document.getElementById('playerName').value.trim();
@@ -100,6 +173,7 @@ function startGame() {
         alert("Please enter your name.");
         return;
     }
+    playSound('clickSound');
     document.getElementById('nameForm').classList.add('hidden');
     document.getElementById('quiz').classList.remove('hidden');
     showQuestion();
@@ -141,6 +215,9 @@ function showQuestion() {
 function checkAnswer(selected) {
     if (selected === questions[currentQuestion].answer) {
         score++;
+        playSound('correctSound');
+    } else {
+        playSound('wrongSound');
     }
     currentQuestion++;
     showQuestion();
@@ -151,11 +228,38 @@ function endGame() {
     document.getElementById('quiz').classList.add('hidden');
     document.getElementById('result').classList.remove('hidden');
     document.getElementById('scoreDisplay').innerText = `You scored ${score} out of 10!`;
-    if (score >= 9) {
-        document.getElementById('rewardMessage').innerText = "Congratulations! You may get 2 free Mentos!";
+
+    const prizeSection = document.getElementById('prizeSection');
+    if (score >= 5) {
+        prizeSection.innerHTML = `<p>Congratulations! You qualify for the Prize Draw!</p><button onclick="startPrizeDraw()">Start Prize Draw</button><div id="prizeResult" class="prize"></div>`;
     } else {
-        document.getElementById('rewardMessage').innerText = "Thank you for playing!";
+        prizeSection.innerHTML = `<p>Thank you for playing!</p>`;
     }
+}
+
+function startPrizeDraw() {
+    playSound('drawSound');
+    const prizeResult = document.getElementById('prizeResult');
+    prizeResult.innerText = "Drawing...";
+    drawn = false;
+
+    setTimeout(() => {
+        let prize = prizes[Math.floor(Math.random() * prizes.length)];
+
+        if (prize === "Draw Again" && !drawn) {
+            prizeResult.innerText = "Wow! You got 'Draw Again'! Drawing one more time...";
+            drawn = true;
+            setTimeout(() => {
+                let secondPrize;
+                do {
+                    secondPrize = prizes[Math.floor(Math.random() * prizes.length)];
+                } while (secondPrize === "Draw Again");
+                prizeResult.innerText = `Your Prize: ${secondPrize}`;
+            }, 2000);
+        } else {
+            prizeResult.innerText = `Your Prize: ${prize}`;
+        }
+    }, 2000);
 }
 </script>
 </body>
